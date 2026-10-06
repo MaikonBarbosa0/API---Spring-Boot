@@ -4,6 +4,7 @@ import com.user.api.dto.CadUsuarioRequest;
 import com.user.api.dto.CadUsuarioResponse;
 import com.user.api.model.CadUsuario;
 import com.user.api.service.CadUsuarioService;
+import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,11 +32,11 @@ public class CadUsuarioController {
     }
 
     @PostMapping
-    public CadUsuarioResponse insert(@RequestBody CadUsuarioRequest cadUsuarioRequest){
+    public CadUsuarioResponse insert(@Valid  @RequestBody CadUsuarioRequest cadUsuarioRequest){
         return cadUsuarioService.insert(cadUsuarioRequest);
     }
     @PutMapping("/{cusuId}")
-    public CadUsuario edit( @PathVariable Integer cusuId, @RequestBody CadUsuario cadUsuario){
+    public CadUsuario edit( @PathVariable Integer cusuId, @Valid @RequestBody CadUsuario cadUsuario){
         return cadUsuarioService.atualizar(cusuId, cadUsuario);
     }
 

@@ -1,6 +1,9 @@
 package com.user.api.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "cad_usuario")
@@ -10,15 +13,20 @@ public class CadUsuario {
     @Column(name = "cusu_id")
     private Integer cusuId;
 
+    @NotBlank
     @Column(name = "cusu_nome")
     private String cusuNome;
 
+    @NotBlank
     @Column(name = "cusu_login")
     private String cusuLogin;
 
+    @Email
+    @NotBlank
     @Column(name = "cusu_email")
     private String cusuEmail;
 
+    @Size(min = 6)
     @Column(name = "cusu_senha")
     private String cusuSenha;
 

@@ -1,9 +1,23 @@
 package com.user.api.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class CadUsuarioRequest {
+
+    @NotBlank
     private String cusuNome;
+
+    @NotBlank
     private String cusuLogin;
+
+    @Size(min = 6,message = "Por favor coloque no minimo 6 letras na senha")
+    @NotBlank
     private String cusuSenha;
+
+    @Email(message = "Por favor insira um email valido")
+    @NotBlank
     private String cusuEmail;
 
     public String getCusuNome() {
