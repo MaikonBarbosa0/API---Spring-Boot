@@ -8,6 +8,7 @@ import com.user.api.model.CadUsuario;
 import com.user.api.repository.CadUsuarioRepository;
 import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,9 +16,12 @@ import java.util.List;
 @Service
 public class CadUsuarioService {
     private final CadUsuarioRepository cadUsuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public CadUsuarioService (CadUsuarioRepository cadUsuarioRepository) {
+
+    public CadUsuarioService (CadUsuarioRepository cadUsuarioRepository,  PasswordEncoder passwordEncoder) {
         this.cadUsuarioRepository = cadUsuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<CadUsuario> listar(){
@@ -32,7 +36,7 @@ public class CadUsuarioService {
         CadUsuario cadUsuario = new CadUsuario();
         cadUsuario.setCusuNome(cadUsuarioRequest.getCusuNome());
         cadUsuario.setCusuLogin(cadUsuarioRequest.getCusuLogin());
-        cadUsuario.setCusuSenha(cadUsuarioRequest.getCusuSenha());
+        cadUsuario.setCusuSenha(passwordEncoder.encode(cadUsuarioRequest.getCusuSenha()));
         cadUsuario.setCusuEmail(cadUsuarioRequest.getCusuEmail());
         CadUsuario cadUsuarioSalvo = cadUsuarioRepository.save(cadUsuario);
         CadUsuarioResponse cadUsuarioResponse = new CadUsuarioResponse();
@@ -48,7 +52,11 @@ public class CadUsuarioService {
         cadUsuarioExistente.setCusuEmail(cadUsuario.getCusuEmail());
         cadUsuarioExistente.setCusuLogin(cadUsuario.getCusuLogin());
         cadUsuarioExistente.setCusuNome(cadUsuario.getCusuNome());
-        cadUsuarioExistente.setCusuSenha(cadUsuario.getCusuSenha());
+
+        if (cadUsuario.getCusuSenha() != null && !cadUsuario.getCusuSenha().isBlank()) {
+            cadUsuarioExistente.setCusuSenha(passwordEncoder.encode(cadUsuario.getCusuSenha()));
+        }
+
         return cadUsuarioRepository.save(cadUsuarioExistente);
     }
 
