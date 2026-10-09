@@ -41,7 +41,7 @@ src/main/java/com/user/api
 │
 ├── model
 │   ├── CadUsuario.java
-│   └── Login.java
+│   ├── Login.java
 │   └── ErrorResponse.java
 │
 ├── repository
