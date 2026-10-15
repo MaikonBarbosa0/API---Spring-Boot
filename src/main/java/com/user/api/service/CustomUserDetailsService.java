@@ -17,14 +17,14 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         CadUsuario usuario = cadUsuarioRepository
-                .findByCusuLogin(username)
+                .findByCusuEmail(email)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("Usuário não encontrado")
                 );
 
-        return User.withUsername(usuario.getCusuLogin()).password(usuario.getCusuSenha()).roles("USER").build();
+        return User.withUsername(usuario.getCusuEmail()).password(usuario.getCusuSenha()).roles("USER").build();
     }
 }
