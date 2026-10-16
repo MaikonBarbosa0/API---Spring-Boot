@@ -3,6 +3,7 @@ package com.user.api.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -26,9 +27,22 @@ public class CadUsuario {
     @Column(name = "cusu_email")
     private String cusuEmail;
 
+
+    @Column(name = "cusu_tusu_id", nullable = false)
+    private Integer cusuTusuId;
+
     @Size(min = 6)
     @Column(name = "cusu_senha")
     private String cusuSenha;
+
+
+    public Integer getCusuTusuId() {
+        return cusuTusuId;
+    }
+
+    public void setCusuTusuId(Integer cusuTusuId) {
+        this.cusuTusuId = cusuTusuId;
+    }
 
     public Integer getCusuId() {
         return cusuId;

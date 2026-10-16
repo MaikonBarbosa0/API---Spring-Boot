@@ -1,6 +1,7 @@
 package com.user.api.config;
 
 
+import com.user.api.enums.TabUsuario;
 import com.user.api.security.JwtAuthenticationFilter;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,6 +36,15 @@ public class SecurityConfig {
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuario").permitAll()
+
+                        // Somente administradores podem excluir usuários
+                        .requestMatchers(HttpMethod.DELETE, "/usuario/**")
+                        .hasRole(TabUsuario.ADMIN.getRole())
+
+                        // Somente administradores podem listar todos os usuários
+                        .requestMatchers(HttpMethod.GET, "/usuario")
+                        .hasRole(TabUsuario.ADMIN.getRole())
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
