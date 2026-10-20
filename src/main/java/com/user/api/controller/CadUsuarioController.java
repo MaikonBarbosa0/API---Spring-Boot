@@ -2,6 +2,7 @@ package com.user.api.controller;
 
 import com.user.api.dto.CadUsuarioRequest;
 import com.user.api.dto.CadUsuarioResponse;
+import com.user.api.enums.TabUsuario;
 import com.user.api.model.CadUsuario;
 import com.user.api.service.CadUsuarioService;
 import jakarta.validation.Valid;
@@ -33,6 +34,9 @@ public class CadUsuarioController {
 
     @PostMapping
     public CadUsuarioResponse insert(@Valid  @RequestBody CadUsuarioRequest cadUsuarioRequest){
+        if (cadUsuarioRequest.getCusuTusuId() == null)
+            cadUsuarioRequest.setCusuTusuId(TabUsuario.USER.getId());
+
         return cadUsuarioService.insert(cadUsuarioRequest);
     }
     @PutMapping("/{cusuId}")

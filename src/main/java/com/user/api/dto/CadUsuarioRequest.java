@@ -2,6 +2,7 @@ package com.user.api.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class CadUsuarioRequest {
@@ -19,6 +20,9 @@ public class CadUsuarioRequest {
     @Email(message = "Por favor insira um email valido")
     @NotBlank
     private String cusuEmail;
+
+    @NotNull
+    private Integer cusuTusuId;
 
     public String getCusuNome() {
         return cusuNome;
@@ -50,5 +54,13 @@ public class CadUsuarioRequest {
 
     public void setCusuEmail(String cusuEmail) {
         this.cusuEmail = cusuEmail;
+    }
+
+    public Integer getCusuTusuId() {
+        return cusuTusuId;
+    }
+
+    public void setCusuTusuId(Integer cusuTusuId) {
+        this.cusuTusuId = cusuTusuId;
     }
 }

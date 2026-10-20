@@ -3,6 +3,7 @@ package com.user.api.service;
 
 import com.user.api.dto.CadUsuarioRequest;
 import com.user.api.dto.CadUsuarioResponse;
+import com.user.api.enums.TabUsuario;
 import com.user.api.exception.CadUsuarioException;
 import com.user.api.model.CadUsuario;
 import com.user.api.repository.CadUsuarioRepository;
@@ -38,6 +39,7 @@ public class CadUsuarioService {
         cadUsuario.setCusuLogin(cadUsuarioRequest.getCusuLogin());
         cadUsuario.setCusuSenha(passwordEncoder.encode(cadUsuarioRequest.getCusuSenha()));
         cadUsuario.setCusuEmail(cadUsuarioRequest.getCusuEmail());
+        cadUsuario.setCusuTusuId(cadUsuarioRequest.getCusuTusuId());
         CadUsuario cadUsuarioSalvo = cadUsuarioRepository.save(cadUsuario);
         CadUsuarioResponse cadUsuarioResponse = new CadUsuarioResponse();
         cadUsuarioResponse.setCusuId(cadUsuarioSalvo.getCusuId());
@@ -56,6 +58,10 @@ public class CadUsuarioService {
         if (cadUsuario.getCusuSenha() != null && !cadUsuario.getCusuSenha().isBlank()) {
             cadUsuarioExistente.setCusuSenha(passwordEncoder.encode(cadUsuario.getCusuSenha()));
         }
+
+        if (cadUsuario.getCusuTusuId() == null)
+            cadUsuario.setCusuTusuId(TabUsuario.USER.getId());
+
 
         return cadUsuarioRepository.save(cadUsuarioExistente);
     }
