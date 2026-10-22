@@ -8,6 +8,12 @@ public class CadUsuarioResponse {
     private String cusuLogin;
     private String cusuEmail;
 
+    public CadUsuarioResponse(Integer cusuId, String cusuNome, String cusuLogin, String cusuEmail) {
+        this.cusuId = cusuId;
+        this.cusuNome = cusuNome;
+        this.cusuLogin = cusuLogin;
+        this.cusuEmail = cusuEmail;
+    }
 
     public Integer getCusuId() {
         return cusuId;

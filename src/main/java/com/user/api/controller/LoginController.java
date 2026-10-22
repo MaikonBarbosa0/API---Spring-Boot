@@ -31,16 +31,10 @@ public class LoginController {
     public ResponseEntity<?> auth(@Valid @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getCusuEmail(),
-                        loginRequest.getCusuSenha()
-                )
+                new UsernamePasswordAuthenticationToken(loginRequest.getCusuEmail(),loginRequest.getCusuSenha())
         );
 
-        String token = jwtService.gerarToken(
-                (org.springframework.security.core.userdetails.UserDetails)
-                        authentication.getPrincipal()
-        );
+        String token = jwtService.gerarToken((org.springframework.security.core.userdetails.UserDetails)authentication.getPrincipal());
 
         return ResponseEntity.ok(Map.of(
                 "token", token,

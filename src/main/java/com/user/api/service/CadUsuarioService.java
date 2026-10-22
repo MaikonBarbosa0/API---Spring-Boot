@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,8 +26,20 @@ public class CadUsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<CadUsuario> listar(){
-        return cadUsuarioRepository.findAll();
+
+    public ArrayList<CadUsuarioResponse> listRespons() {
+        return cadUsuarioRepository.listarUsuarios();
+    }
+
+    public List<CadUsuarioResponse> listar(){
+        List<CadUsuario> usuarios = cadUsuarioRepository.findAll();
+        List<CadUsuarioResponse> respostas = new ArrayList<>();
+
+        for (CadUsuario usuario : usuarios) {
+            respostas.add(toResponse(usuario));
+        }
+
+        return respostas;
     }
 
     public CadUsuario findUser(Integer cusuId){
@@ -47,6 +60,19 @@ public class CadUsuarioService {
         cadUsuarioResponse.setCusuLogin(cadUsuarioSalvo.getCusuLogin());
         cadUsuarioResponse.setCusuEmail(cadUsuarioSalvo.getCusuEmail());
         return cadUsuarioResponse;
+    }
+
+
+    public CadUsuarioResponse toResponse(CadUsuario cadUsuario){
+
+        CadUsuarioResponse response = new CadUsuarioResponse();
+
+        response.setCusuId(cadUsuario.getCusuId());
+        response.setCusuNome(cadUsuario.getCusuNome());
+        response.setCusuLogin(cadUsuario.getCusuLogin());
+        response.setCusuEmail(cadUsuario.getCusuEmail());
+
+        return response;
     }
 
     public CadUsuario atualizar(Integer cusuId, CadUsuario cadUsuario){

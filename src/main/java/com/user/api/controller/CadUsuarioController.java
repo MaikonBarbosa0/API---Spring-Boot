@@ -23,7 +23,7 @@ public class CadUsuarioController {
     }
 
     @GetMapping
-    public List<CadUsuario> listar() {
+    public List<CadUsuarioResponse> listar() {
         return cadUsuarioService.listar();
     }
 
