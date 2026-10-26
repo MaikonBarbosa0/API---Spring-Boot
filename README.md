@@ -40,6 +40,16 @@ O projeto faz parte dos meus estudos de desenvolvimento backend e aplica conceit
 
 **O fluxo de autenticação usa JWT Bearer. As instruções antigas de HTTP Basic foram substituídas.**
 
+### Recuperação de senha (em desenvolvimento)
+
+- Endpoint `POST /login/reset` para iniciar a solicitação de recuperação.
+- DTO `LoginResetPassword` com e-mail obrigatório e válido (`cusuEmail`) e login obrigatório (`cusuUser`).
+- Consulta da combinação de e-mail e login pelo método `findByCusuEmailAndCusuLogin` do repository.
+- Regra de consulta no `LoginService`, com resposta HTTP definida pelo `LoginController`.
+- Interface `EmailService` e implementação `EmailServiceConsole`, disponível no perfil `dev`, para simular o envio de um link nos logs.
+
+**O fluxo ainda não redefine a senha.** O `LoginService` não chama o `EmailService` e ainda não gera nem armazena tokens de recuperação. A implementação de console está preparada, mas não é acionada pelo endpoint atual. Também estão pendentes a validação de token com expiração e uso único e a gravação da nova senha com BCrypt.
+
 ## 📁 Estrutura do projeto
 
 Organização lógica dos principais componentes. A localização de `TabUsuario` e `JwtAuthenticationFilter` pode variar conforme os pacotes adotados no código.
@@ -56,6 +66,7 @@ src/main/java/com/user/api
 │   ├── CadUsuarioRequest.java
 │   ├── CadUsuarioResponse.java
 │   ├── LoginRequest.java
+│   ├── LoginResetPassword.java
 │   └── LoginResponse.java
 ├── exception
 │   ├── CadUsuarioException.java
@@ -72,6 +83,8 @@ src/main/java/com/user/api
 └── service
     ├── CadUsuarioService.java
     ├── CustomUserDetailsService.java
+    ├── EmailService.java
+    ├── EmailServiceConsole.java
     ├── JwtService.java
     └── LoginService.java
 
@@ -96,6 +109,7 @@ URL base local: `http://localhost:8080`.
 | Método | Endpoint | Descrição | Acesso |
 | --- | --- | --- | --- |
 | POST | `/login` | Autenticar e obter JWT | Público |
+| POST | `/login/reset` | Solicitar recuperação de senha (em desenvolvimento) | Atualmente exige autenticação |
 | POST | `/usuario` | Cadastrar usuário | Público |
 | GET | `/usuario` | Listar usuários | `ADMIN` |
 | GET | `/usuario/{id}` | Consultar usuário por ID | Regra de acesso ao próprio usuário pendente |
@@ -103,6 +117,8 @@ URL base local: `http://localhost:8080`.
 | DELETE | `/usuario/{id}` | Excluir usuário | `ADMIN` |
 
 `{id}` representa o identificador do usuário, também referido como `{cusuId}` no controller.
+
+**Configuração pendente do reset:** o `SecurityConfig` libera `POST /usuario/reset`, mas o endpoint implementado no `LoginController` é `POST /login/reset`. Assim, a rota de recuperação existente ainda cai na regra geral de autenticação. É necessário alinhar a configuração para permitir a solicitação sem JWT.
 
 ### Limitação atual: acesso aos próprios dados
 
@@ -278,6 +294,37 @@ Na aba **Bearer Token**, informe somente o token, sem repetir o prefixo `Bearer`
 
 Para excluir um usuário, use `DELETE {{baseUrl}}/usuario/123` com token de `ADMIN`, substituindo `123` pelo ID desejado. Essa operação remove o registro; utilize dados de teste.
 
+### 4. Solicitar recuperação de senha (em desenvolvimento)
+
+- Método: `POST`
+- URL: `{{baseUrl}}/login/reset`
+- Authorization: **Bearer Token**, com `{{token}}`, enquanto a liberação pública da rota não for corrigida.
+- Body: **raw → JSON**
+- Header: `Content-Type: application/json`
+
+```json
+{
+  "cusuEmail": "usuario@example.com",
+  "cusuUser": "usuario.exemplo"
+}
+```
+
+O campo `cusuUser` corresponde ao login cadastrado (`cusuLogin`). Quando a combinação é encontrada, o endpoint retorna `200 OK` com o texto:
+
+```text
+Enviaremos uma solicitação para o email informado.
+```
+
+Essa resposta ainda não significa que um e-mail foi enviado. Quando a combinação não é encontrada, o service lança `UsernameNotFoundException` com o mesmo texto; o retorno HTTP desse caso ainda precisa ser padronizado para ter o mesmo status e corpo do caso de sucesso.
+
+Para disponibilizar a implementação de e-mail no console, ative o perfil `dev`. No PowerShell, antes de iniciar a aplicação:
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE = "dev"
+```
+
+O perfil disponibiliza o `EmailServiceConsole`; os logs de envio só aparecerão quando o fluxo passar a chamar `enviarLinkReset`. Use essa simulação apenas no desenvolvimento, pois o link de recuperação permitirá redefinir a senha.
+
 ### Diagnóstico rápido
 
 - Confirme o método, a URL e o body JSON em `POST /login`.
@@ -293,6 +340,13 @@ Para excluir um usuário, use `DELETE {{baseUrl}}/usuario/123` com token de `ADM
 - [x] Criar `JwtService` e `JwtAuthenticationFilter`.
 - [x] Configurar segurança stateless.
 - [x] Restringir listagem e exclusão ao perfil `ADMIN`.
+- [x] Criar endpoint e DTO da solicitação de recuperação e consulta por e-mail e login.
+- [x] Criar interface de envio de e-mail e implementação de console no perfil `dev`.
+- [ ] Alinhar a liberação pública de `/login/reset` no `SecurityConfig`.
+- [ ] Padronizar a resposta de recuperação para contas encontradas e não encontradas.
+- [ ] Gerar e armazenar tokens de recuperação com expiração e uso único.
+- [ ] Integrar o `EmailService` ao fluxo de recuperação e implementar o envio real de e-mail.
+- [ ] Implementar confirmação do reset com token e gravação da nova senha com BCrypt.
 - [ ] Proteger consulta e atualização dos próprios dados com validação de titularidade.
 - [ ] Revisar o cadastro público para impedir atribuição indevida de perfis.
 - [ ] Integrar a autenticação com o frontend Angular.

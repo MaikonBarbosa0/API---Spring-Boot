@@ -36,6 +36,7 @@ public class SecurityConfig {
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuario").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/usuario/reset").permitAll()
 
                         // Somente administradores podem excluir usuários
                         .requestMatchers(HttpMethod.DELETE, "/usuario/**")

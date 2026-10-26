@@ -3,6 +3,7 @@ package com.user.api.service;
 
 import com.user.api.dto.CadUsuarioRequest;
 import com.user.api.dto.CadUsuarioResponse;
+import com.user.api.dto.LoginResetPassword;
 import com.user.api.enums.TabUsuario;
 import com.user.api.exception.CadUsuarioException;
 import com.user.api.model.CadUsuario;

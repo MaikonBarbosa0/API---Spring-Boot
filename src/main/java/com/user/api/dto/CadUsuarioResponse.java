@@ -8,6 +8,8 @@ public class CadUsuarioResponse {
     private String cusuLogin;
     private String cusuEmail;
 
+    public CadUsuarioResponse(){}
+
     public CadUsuarioResponse(Integer cusuId, String cusuNome, String cusuLogin, String cusuEmail) {
         this.cusuId = cusuId;
         this.cusuNome = cusuNome;
