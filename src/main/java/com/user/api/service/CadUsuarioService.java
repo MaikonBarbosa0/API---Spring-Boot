@@ -53,7 +53,7 @@ public class CadUsuarioService {
         cadUsuario.setCusuLogin(cadUsuarioRequest.getCusuLogin());
         cadUsuario.setCusuSenha(passwordEncoder.encode(cadUsuarioRequest.getCusuSenha()));
         cadUsuario.setCusuEmail(cadUsuarioRequest.getCusuEmail());
-        cadUsuario.setCusuTusuId(cadUsuarioRequest.getCusuTusuId());
+        cadUsuario.setCusuTusuId(TabUsuario.USER.getId());
         CadUsuario cadUsuarioSalvo = cadUsuarioRepository.save(cadUsuario);
         CadUsuarioResponse cadUsuarioResponse = new CadUsuarioResponse();
         cadUsuarioResponse.setCusuId(cadUsuarioSalvo.getCusuId());

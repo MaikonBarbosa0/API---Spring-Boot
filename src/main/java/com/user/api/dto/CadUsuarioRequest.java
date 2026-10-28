@@ -21,9 +21,6 @@ public class CadUsuarioRequest {
     @NotBlank
     private String cusuEmail;
 
-    @NotNull
-    private Integer cusuTusuId;
-
     public String getCusuNome() {
         return cusuNome;
     }
@@ -54,13 +51,5 @@ public class CadUsuarioRequest {
 
     public void setCusuEmail(String cusuEmail) {
         this.cusuEmail = cusuEmail;
-    }
-
-    public Integer getCusuTusuId() {
-        return cusuTusuId;
-    }
-
-    public void setCusuTusuId(Integer cusuTusuId) {
-        this.cusuTusuId = cusuTusuId;
     }
 }

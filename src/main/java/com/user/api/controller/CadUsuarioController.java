@@ -28,20 +28,18 @@ public class CadUsuarioController {
     }
 
     @GetMapping("/{cusuId}")
-    public ResponseEntity<CadUsuario> get(@PathVariable Integer cusuId){
-        return ResponseEntity.ok(cadUsuarioService.findUser(cusuId));
+    public ResponseEntity<CadUsuarioResponse> get(@PathVariable Integer cusuId){
+        CadUsuario usuario = cadUsuarioService.findUser(cusuId);
+        return ResponseEntity.ok(cadUsuarioService.toResponse(usuario));
     }
 
     @PostMapping
     public CadUsuarioResponse insert(@Valid  @RequestBody CadUsuarioRequest cadUsuarioRequest){
-        if (cadUsuarioRequest.getCusuTusuId() == null)
-            cadUsuarioRequest.setCusuTusuId(TabUsuario.USER.getId());
-
         return cadUsuarioService.insert(cadUsuarioRequest);
     }
     @PutMapping("/{cusuId}")
-    public CadUsuario edit( @PathVariable Integer cusuId, @Valid @RequestBody CadUsuario cadUsuario){
-        return cadUsuarioService.atualizar(cusuId, cadUsuario);
+    public CadUsuarioResponse edit( @PathVariable Integer cusuId, @Valid @RequestBody CadUsuario cadUsuario){
+        return cadUsuarioService.toResponse(cadUsuarioService.atualizar(cusuId, cadUsuario));
     }
 
     @DeleteMapping("/{cusuId}")
