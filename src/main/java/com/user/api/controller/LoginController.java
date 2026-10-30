@@ -4,9 +4,9 @@ package com.user.api.controller;
 import com.user.api.dto.LoginRequest;
 import com.user.api.dto.LoginResetPassword;
 import com.user.api.security.JwtService;
+import com.user.api.security.UsuarioAutenticado;
 import com.user.api.service.LoginService;
 import jakarta.validation.Valid;
-import org.apache.juli.logging.Log;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,7 +37,7 @@ public class LoginController {
                 new UsernamePasswordAuthenticationToken(loginRequest.getCusuEmail(),loginRequest.getCusuSenha())
         );
 
-        String token = jwtService.gerarToken((org.springframework.security.core.userdetails.UserDetails)
+        String token = jwtService.gerarToken((UsuarioAutenticado)
                 authentication.getPrincipal());
 
         return ResponseEntity.ok(Map.of(

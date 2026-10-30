@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -40,11 +39,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authorization.substring(7);
 
         try {
-            String login = jwtService.extrairLogin(token);
+            Integer id = jwtService.extrairUsuarioId(token);
 
-            if (login != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (id != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                UserDetails usuario = userDetailsService.loadUserByUsername(login);
+                UsuarioAutenticado usuario = userDetailsService.buscarPorId(id);
 
                 if (jwtService.tokenValido(token, usuario)) {
 

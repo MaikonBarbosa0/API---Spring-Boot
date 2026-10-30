@@ -1,20 +1,26 @@
 package com.user.api.service;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.user.api.dto.CadUsuarioRequest;
 import com.user.api.dto.CadUsuarioResponse;
-import com.user.api.dto.LoginResetPassword;
+import com.user.api.dto.CadUsuarioUpdateRequest;
 import com.user.api.enums.TabUsuario;
 import com.user.api.exception.CadUsuarioException;
 import com.user.api.model.CadUsuario;
 import com.user.api.repository.CadUsuarioRepository;
-import org.apache.coyote.Response;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.user.api.security.UsuarioAutenticado;
 
 @Service
 public class CadUsuarioService {
@@ -32,6 +38,7 @@ public class CadUsuarioService {
         return cadUsuarioRepository.listarUsuarios();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public List<CadUsuarioResponse> listar(){
         List<CadUsuario> usuarios = cadUsuarioRepository.findAll();
         List<CadUsuarioResponse> respostas = new ArrayList<>();
@@ -44,7 +51,33 @@ public class CadUsuarioService {
     }
 
     public CadUsuario findUser(Integer cusuId){
-        return cadUsuarioRepository.findById(cusuId).orElseThrow(() -> new CadUsuarioException("User not Found"));
+        CadUsuario usuario = cadUsuarioRepository.findById(cusuId)
+                .orElseThrow(() -> new CadUsuarioException("User not Found"));
+        validarAcesso(usuario);
+        return usuario;
+    }
+
+    private void validarAcesso(CadUsuario usuario) {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            throw new AccessDeniedException("Acesso negado.");
+        }
+
+        boolean administrador = authentication.getAuthorities()
+                .stream()
+                .anyMatch(authority -> authority.getAuthority()
+                        .equals("ROLE_" + TabUsuario.ADMIN.getRole()));
+
+        boolean proprioUsuario = authentication.getPrincipal() instanceof UsuarioAutenticado autenticado
+                && usuario.getCusuId().equals(autenticado.getId());
+
+        if (!administrador && !proprioUsuario) {
+            throw new AccessDeniedException("Acesso negado.");
+        }
     }
 
     public CadUsuarioResponse insert(CadUsuarioRequest cadUsuarioRequest) {
@@ -76,23 +109,17 @@ public class CadUsuarioService {
         return response;
     }
 
-    public CadUsuario atualizar(Integer cusuId, CadUsuario cadUsuario){
+    @PreAuthorize("hasRole('ADMIN')")
+    public CadUsuario atualizar(Integer cusuId, CadUsuarioUpdateRequest request){
         CadUsuario cadUsuarioExistente = findUser(cusuId);
-        cadUsuarioExistente.setCusuEmail(cadUsuario.getCusuEmail());
-        cadUsuarioExistente.setCusuLogin(cadUsuario.getCusuLogin());
-        cadUsuarioExistente.setCusuNome(cadUsuario.getCusuNome());
-
-        if (cadUsuario.getCusuSenha() != null && !cadUsuario.getCusuSenha().isBlank()) {
-            cadUsuarioExistente.setCusuSenha(passwordEncoder.encode(cadUsuario.getCusuSenha()));
-        }
-
-        if (cadUsuario.getCusuTusuId() == null)
-            cadUsuario.setCusuTusuId(TabUsuario.USER.getId());
-
+        cadUsuarioExistente.setCusuEmail(request.getCusuEmail());
+        cadUsuarioExistente.setCusuLogin(request.getCusuLogin());
+        cadUsuarioExistente.setCusuNome(request.getCusuNome());
 
         return cadUsuarioRepository.save(cadUsuarioExistente);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String>  delete(Integer cusuId){
        CadUsuario cadUsuarioExistente = findUser(cusuId);
 

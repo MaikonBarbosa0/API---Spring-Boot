@@ -112,19 +112,21 @@ URL base local: `http://localhost:8080`.
 | POST | `/login/reset` | Solicitar recuperação de senha (em desenvolvimento) | Atualmente exige autenticação |
 | POST | `/usuario` | Cadastrar usuário | Público |
 | GET | `/usuario` | Listar usuários | `ADMIN` |
-| GET | `/usuario/{id}` | Consultar usuário por ID | Regra de acesso ao próprio usuário pendente |
-| PUT | `/usuario/{id}` | Atualizar usuário | Regra de acesso ao próprio usuário pendente |
+| GET | `/usuario/{id}` | Consultar usuário por ID | Próprio usuário ou `ADMIN` |
+| PUT | `/usuario/{id}` | Atualizar usuário | Próprio usuário ou `ADMIN` |
 | DELETE | `/usuario/{id}` | Excluir usuário | `ADMIN` |
 
 `{id}` representa o identificador do usuário, também referido como `{cusuId}` no controller.
 
 **Configuração pendente do reset:** o `SecurityConfig` libera `POST /usuario/reset`, mas o endpoint implementado no `LoginController` é `POST /login/reset`. Assim, a rota de recuperação existente ainda cai na regra geral de autenticação. É necessário alinhar a configuração para permitir a solicitação sem JWT.
 
-### Limitação atual: acesso aos próprios dados
+### Acesso aos próprios dados
 
-As rotas de consulta e atualização por ID ainda não possuem proteção específica para garantir que um usuário comum acesse somente os próprios dados. A exigência de autenticação nessas rotas depende da regra geral configurada no `SecurityConfig`; ela, sozinha, não verifica a titularidade do registro.
+O `CadUsuarioService.findUser` valida a titularidade antes de devolver o registro e antes dos setters da atualização. A operação permite o dono da conta, identificado pelo ID de `UsuarioAutenticado`, ou um administrador. Outros usuários recebem acesso negado.
 
-Antes de disponibilizar a API em produção, implemente a comparação entre a identidade autenticada e o usuário solicitado, com exceções explícitas para administradores. Não considere essas rotas seguras apenas porque o cliente envia um JWT.
+O JWT agora contém o ID do usuário no subject. O filtro valida a assinatura e carrega a conta pelo ID, mantendo a identidade mesmo após alteração do e-mail. O login continua usando e-mail e senha. Faça novo login após esta atualização: os tokens antigos com e-mail no subject não são aceitos.
+
+Os testes `UsuarioSecurityTests` verificam acesso do dono, acesso administrativo, bloqueio de terceiros, ausência de autenticação e identidade do JWT após mudança de e-mail. Execute `./mvnw.cmd -Dtest=UsuarioSecurityTests test` no PowerShell. São testes unitários; não substituem uma verificação HTTP com a aplicação e o banco em execução.
 
 ## 🔐 Perfis de usuário
 
@@ -347,7 +349,7 @@ O perfil disponibiliza o `EmailServiceConsole`; os logs de envio só aparecerão
 - [ ] Gerar e armazenar tokens de recuperação com expiração e uso único.
 - [ ] Integrar o `EmailService` ao fluxo de recuperação e implementar o envio real de e-mail.
 - [ ] Implementar confirmação do reset com token e gravação da nova senha com BCrypt.
-- [ ] Proteger consulta e atualização dos próprios dados com validação de titularidade.
+- [x] Proteger consulta e atualização dos próprios dados com validação de titularidade.
 - [ ] Revisar o cadastro público para impedir atribuição indevida de perfis.
 - [ ] Integrar a autenticação com o frontend Angular.
 - [ ] Revisar os DTOs e garantir que nenhuma resposta exponha hashes de senha.

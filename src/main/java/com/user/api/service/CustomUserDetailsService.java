@@ -1,9 +1,8 @@
 package com.user.api.service;
 
-import com.user.api.enums.TabUsuario;
+import com.user.api.security.UsuarioAutenticado;
 import com.user.api.model.CadUsuario;
 import com.user.api.repository.CadUsuarioRepository;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,6 +25,11 @@ public class CustomUserDetailsService implements UserDetailsService {
                         new UsernameNotFoundException("Usuário não encontrado")
                 );
 
-        return User.withUsername(usuario.getCusuEmail()).password(usuario.getCusuSenha()).roles(TabUsuario.getById(usuario.getCusuTusuId()).getRole()).build();
+        return new UsuarioAutenticado(usuario);
+    }
+
+    public UsuarioAutenticado buscarPorId(Integer id) {
+        return new UsuarioAutenticado(cadUsuarioRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado")));
     }
 }

@@ -2,6 +2,7 @@ package com.user.api.controller;
 
 import com.user.api.dto.CadUsuarioRequest;
 import com.user.api.dto.CadUsuarioResponse;
+import com.user.api.dto.CadUsuarioUpdateRequest;
 import com.user.api.enums.TabUsuario;
 import com.user.api.model.CadUsuario;
 import com.user.api.service.CadUsuarioService;
@@ -38,8 +39,8 @@ public class CadUsuarioController {
         return cadUsuarioService.insert(cadUsuarioRequest);
     }
     @PutMapping("/{cusuId}")
-    public CadUsuarioResponse edit( @PathVariable Integer cusuId, @Valid @RequestBody CadUsuario cadUsuario){
-        return cadUsuarioService.toResponse(cadUsuarioService.atualizar(cusuId, cadUsuario));
+    public CadUsuarioResponse edit( @PathVariable Integer cusuId, @Valid @RequestBody CadUsuarioUpdateRequest request){
+        return cadUsuarioService.toResponse(cadUsuarioService.atualizar(cusuId, request));
     }
 
     @DeleteMapping("/{cusuId}")

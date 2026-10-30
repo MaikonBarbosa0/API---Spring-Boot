@@ -6,7 +6,6 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -24,28 +23,28 @@ public class JwtService {
         this.signingKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String gerarToken(UserDetails userDetails) {
+    public String gerarToken(UsuarioAutenticado userDetails) {
         Date agora = new Date();
         Date expiracao = new Date(agora.getTime() + 1000 * 60 * 15);
 
         return Jwts.builder()
-                .subject(userDetails.getUsername())
+                .subject(userDetails.getId().toString())
                 .issuedAt(agora)
                 .expiration(expiracao)
                 .signWith(signingKey)
                 .compact();
     }
 
-    public String extrairLogin(String token) {
-        return extrairClaims(token).getSubject();
+    public Integer extrairUsuarioId(String token) {
+        return Integer.valueOf(extrairClaims(token).getSubject());
     }
 
     public boolean tokenValido(
-            String token, UserDetails userDetails) {
+            String token, UsuarioAutenticado userDetails) {
 
-        String login = extrairLogin(token);
+        Integer id = extrairUsuarioId(token);
 
-        return login.equals(userDetails.getUsername())
+        return id.equals(userDetails.getId())
                 && extrairClaims(token).getExpiration().after(new Date());
     }
 
